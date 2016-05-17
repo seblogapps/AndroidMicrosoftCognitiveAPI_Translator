@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(LOG_TAG, "RECORD_AUDIO permission granted");
+                    Log.d(LOG_TAG, "RECORD_AUDIO permission granted!");
                     initRecording();
                     startRecording();
                 } else {
