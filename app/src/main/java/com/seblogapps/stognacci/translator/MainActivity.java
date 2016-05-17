@@ -35,7 +35,7 @@ import com.microsoft.speech.tts.Voice;
 public class MainActivity extends AppCompatActivity
         implements ISpeechRecognitionServerEvents {
 
-    public static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private MicrophoneRecognitionClient mMicrophoneRecognitionClient = null;
     private SpeechRecognitionMode mSpeechRecognitionMode = SpeechRecognitionMode.ShortPhrase;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     private int onLineIcon;
     private int busyIcon;
 
-    ImageButton speakButton;
+    private ImageButton speakButton;
 
     private boolean mHasStartedRecording = false;
     private boolean mHasOptionsChanged = true;
@@ -332,8 +332,9 @@ public class MainActivity extends AppCompatActivity
             mFloatingActionButton.setEnabled(true);
             mFloatingActionButton.setImageResource(onLineIcon);
         } else {
-            if (mSpeechRecognitionMode == SpeechRecognitionMode.ShortPhrase) ;
+            if (mSpeechRecognitionMode == SpeechRecognitionMode.ShortPhrase) {
             mFloatingActionButton.setEnabled(false);
+            }
         }
         mFloatingActionButton.setImageResource(busyIcon);
         mResultText.append(isRecording ? getString(R.string.recording_start) : getString(R.string.recording_end));
