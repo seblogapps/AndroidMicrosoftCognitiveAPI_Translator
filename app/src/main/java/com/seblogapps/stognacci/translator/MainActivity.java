@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
                     // Check android runtime permission for RECORD_AUDIO
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
                             != PackageManager.PERMISSION_GRANTED) {
-                        Log.d(LOG_TAG, "RECORD_AUDIO permission denied");
+                        Log.d(LOG_TAG, "RECORD_AUDIO permission denied!");
                         if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO)) {
                             Snackbar.make(findViewById(R.id.activity_main), "I must have record audio permission", Snackbar.LENGTH_INDEFINITE)
                                     .setAction("Try again", new View.OnClickListener() {
