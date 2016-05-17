@@ -85,12 +85,6 @@ public class MainActivity extends AppCompatActivity
         initLanguageSpinner();
         initSpeechModeSpinner();
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO);
-        boolean hasRecordAudioPermission;
-        hasRecordAudioPermission = permissionCheck == PackageManager.PERMISSION_GRANTED ? true : false;
-        Log.d(LOG_TAG, "Record Audio Permission: " + hasRecordAudioPermission);
-
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,19 +93,26 @@ public class MainActivity extends AppCompatActivity
                     mResultText.setText("");
                     mSuggestionLayoutView.setVisibility(View.GONE);
                     mResultText.setVisibility(View.VISIBLE);
-                    initRecording();
-                    if (mMicrophoneRecognitionClient != null) {
-                        if (mSpeechRecognitionMode.equals(SpeechRecognitionMode.ShortPhrase)) {
-                            if (!mHasStartedRecording) {
-                                mMicrophoneRecognitionClient.startMicAndRecognition();
-                            }
-                        } else if (mSpeechRecognitionMode.equals(SpeechRecognitionMode.LongDictation)) {
-                            if (!mHasStartedRecording) {
-                                mMicrophoneRecognitionClient.startMicAndRecognition();
-                            } else {
-                                mMicrophoneRecognitionClient.endMicAndRecognition();
-                            }
+                    // Check android runtime permission for RECORD_AUDIO
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        Log.d(LOG_TAG, "RECORD_AUDIO permission denied");
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO)) {
+                            Snackbar.make(findViewById(R.id.activity_main), "I must have record audio permission", Snackbar.LENGTH_INDEFINITE)
+                                    .setAction("Try again", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
+                                                    Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO);
+                                        }
+                                    }).show();
+                        } else {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
+                                    Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO);
                         }
+                    } else {
+                        initRecording();
+                        startRecording();
                     }
                 } else {
                     Snackbar.make(view, getString(R.string.check_connection), Snackbar.LENGTH_LONG)
@@ -184,29 +185,28 @@ public class MainActivity extends AppCompatActivity
             } else {
                 mResultText.append(getString(R.string.secondary_connect));
             }
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-                    Snackbar.make(findViewById(R.id.activity_main), "I must have record audio permission", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("Try again", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
-                                            Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO);
-                                }
-                            }).show();
-                } else {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
-                            Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO);
-                }
-            } else {
-                mMicrophoneRecognitionClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mSpeechRecognitionMode, mLanguageCode, this, mKey, mSecKey);
-                mHasOptionsChanged = false;
-            }
+            mMicrophoneRecognitionClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mSpeechRecognitionMode, mLanguageCode, this, mKey, mSecKey);
+            mHasOptionsChanged = false;
         }
         // Discard previous translation
         mItemAdapter.clear();
         speakButton.setVisibility(View.GONE);
+    }
+
+    private void startRecording() {
+        if (mMicrophoneRecognitionClient != null) {
+            if (mSpeechRecognitionMode.equals(SpeechRecognitionMode.ShortPhrase)) {
+                if (!mHasStartedRecording) {
+                    mMicrophoneRecognitionClient.startMicAndRecognition();
+                }
+            } else if (mSpeechRecognitionMode.equals(SpeechRecognitionMode.LongDictation)) {
+                if (!mHasStartedRecording) {
+                    mMicrophoneRecognitionClient.startMicAndRecognition();
+                } else {
+                    mMicrophoneRecognitionClient.endMicAndRecognition();
+                }
+            }
+        }
     }
 
     @Override
@@ -215,8 +215,8 @@ public class MainActivity extends AppCompatActivity
             case Constants.MY_PERMISSION_REQUEST_RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(LOG_TAG, "RECORD_AUDIO permission granted");
-                    mMicrophoneRecognitionClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mSpeechRecognitionMode, mLanguageCode, this, mKey, mSecKey);
-                    mHasOptionsChanged = false;
+                    initRecording();
+                    startRecording();
                 } else {
                     Snackbar.make(findViewById(R.id.activity_main), "Sorry app will not work without that permission", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
