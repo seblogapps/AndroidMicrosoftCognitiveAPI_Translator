@@ -3,7 +3,6 @@ package com.seblogapps.stognacci.translator;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,8 +50,8 @@ public class MainActivity extends AppCompatActivity
     private ItemAdapter mItemAdapter = new ItemAdapter(this);
     private View mSuggestionLayoutView;
 
-    private Drawable onlineIcon;
-    private Drawable busyIcon;
+    private int onLineIcon;
+    private int busyIcon;
 
     ImageButton speakButton;
 
@@ -75,8 +74,9 @@ public class MainActivity extends AppCompatActivity
         mResultText = (TextView) findViewById(R.id.resultText);
         mSuggestionLayoutView = findViewById(R.id.suggestionLayout);
 
-        onlineIcon = getResources().getDrawable(android.R.drawable.presence_audio_online);
-        busyIcon = getResources().getDrawable(android.R.drawable.presence_audio_busy);
+        onLineIcon = R.drawable.presence_audio_online;
+        busyIcon = R.drawable.presence_audio_busy;
+
 
         speakButton = (ImageButton) findViewById(R.id.speak_button);
 
@@ -244,7 +244,8 @@ public class MainActivity extends AppCompatActivity
                 mMicrophoneRecognitionClient.endMicAndRecognition();
             }
             mFloatingActionButton.setEnabled(true);
-            mFloatingActionButton.setImageDrawable(onlineIcon);
+            //mFloatingActionButton.setImageDrawable(onlineIcon);
+            mFloatingActionButton.setImageResource(onLineIcon);
         }
 
         if (recognitionResult.Results.length > 0) {
@@ -313,7 +314,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onError(int errorCode, String response) {
         mFloatingActionButton.setEnabled(true);
-        mFloatingActionButton.setImageDrawable(onlineIcon);
+        mFloatingActionButton.setImageResource(onLineIcon);
         Snackbar.make(findViewById(R.id.activity_main), getString(R.string.internet_error_text), Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         mResultText.append("Error: " + errorCode + " : " + response + "\n");
@@ -329,12 +330,12 @@ public class MainActivity extends AppCompatActivity
                 mMicrophoneRecognitionClient.endMicAndRecognition();
             }
             mFloatingActionButton.setEnabled(true);
-            mFloatingActionButton.setImageDrawable(onlineIcon);
+            mFloatingActionButton.setImageResource(onLineIcon);
         } else {
             if (mSpeechRecognitionMode == SpeechRecognitionMode.ShortPhrase) ;
             mFloatingActionButton.setEnabled(false);
         }
-        mFloatingActionButton.setImageDrawable(busyIcon);
+        mFloatingActionButton.setImageResource(busyIcon);
         mResultText.append(isRecording ? getString(R.string.recording_start) : getString(R.string.recording_end));
     }
 

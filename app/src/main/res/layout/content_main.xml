@@ -41,7 +41,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_horizontal"
                 android:adjustViewBounds="true"
-                android:src="@drawable/ic_speaker"
+                android:background="@drawable/ic_speaker"
                 android:visibility="gone"
                 tools:visibility="visible"/>
 
